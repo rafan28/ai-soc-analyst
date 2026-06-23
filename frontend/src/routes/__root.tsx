@@ -78,7 +78,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "Protecto SOC Analyst — AI-Powered Threat Detection" },
-      { name: "description", content: "AI-driven SOC platform for log analysis, threat detection, and MITRE ATT&CK investigation." },
+      {
+        name: "description",
+        content:
+          "AI-driven SOC platform for log analysis, threat detection, and MITRE ATT&CK investigation.",
+      },
       { name: "author", content: "Protecto Security" },
       { property: "og:title", content: "Protecto SOC Analyst" },
       { property: "og:description", content: "AI-driven SOC platform for security analysts." },

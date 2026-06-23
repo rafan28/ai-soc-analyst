@@ -14,7 +14,9 @@ function DashboardLayout() {
       <div className="flex min-w-0 flex-1 flex-col">
         <TopBar />
         <MobileSidebar />
-        <main className="min-w-0 flex-1"><Outlet /></main>
+        <main className="min-w-0 flex-1">
+          <Outlet />
+        </main>
       </div>
     </div>
   );

@@ -1,102 +1,221 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
-import { Bot, CheckCircle2, Copy, Download, FileDown, Sparkles } from "lucide-react";
+import { Fragment, useState, type ReactNode } from "react";
+import {
+  Bot,
+  CheckCircle2,
+  Copy,
+  Download,
+  FileDown,
+  Network,
+  Sparkles,
+  Target,
+} from "lucide-react";
+import { EmptyState } from "@/components/dashboard/EmptyState";
 import { PageHeader } from "@/components/dashboard/PageHeader";
 import { Button } from "@/components/ui/button";
-import { SeverityBadge } from "@/components/dashboard/SeverityBadge";
-import { mockAiReport } from "@/lib/mockData";
+import { selectMitreTechniques, useAnalysisStore } from "@/lib/analysisStore";
 
 export const Route = createFileRoute("/dashboard/investigation")({ component: InvestigationPage });
 
-function inlineMd(s: string) {
-  return s
-    .replace(/\*\*(.+?)\*\*/g, "<strong class='text-foreground'>$1</strong>")
-    .replace(/`([^`]+)`/g, "<code class='rounded bg-muted px-1 py-0.5 font-mono text-xs text-primary'>$1</code>");
+function inline(text: string): ReactNode[] {
+  return text
+    .split(/(\*\*.*?\*\*|`.*?`)/g)
+    .filter(Boolean)
+    .map((part, index) => {
+      if (part.startsWith("**") && part.endsWith("**"))
+        return (
+          <strong key={index} className="font-semibold text-foreground">
+            {part.slice(2, -2)}
+          </strong>
+        );
+      if (part.startsWith("`") && part.endsWith("`"))
+        return (
+          <code key={index} className="rounded bg-muted px-1 py-0.5 font-mono text-xs text-primary">
+            {part.slice(1, -1)}
+          </code>
+        );
+      return <Fragment key={index}>{part}</Fragment>;
+    });
 }
 
-function renderMarkdown(md: string) {
-  return md.split("\n\n").map((block, i) => {
-    if (block.startsWith("## ")) {
-      return <h2 key={i} className="mt-8 text-xl font-bold tracking-tight first:mt-0">{block.slice(3)}</h2>;
-    }
-    if (block.startsWith("- ") || /^\d+\.\s/.test(block)) {
-      const items = block.split("\n");
-      const ordered = /^\d+\.\s/.test(items[0]);
-      const className = `mt-3 space-y-2 ${ordered ? "list-decimal" : "list-disc"} pl-5 text-sm text-muted-foreground`;
-      const lis = items.map((it, j) => (
-        <li key={j} dangerouslySetInnerHTML={{ __html: inlineMd(it.replace(/^(\d+\.\s|- )/, "")) }} />
-      ));
-      return ordered ? <ol key={i} className={className}>{lis}</ol> : <ul key={i} className={className}>{lis}</ul>;
-    }
-    return <p key={i} className="mt-3 text-sm leading-relaxed text-muted-foreground" dangerouslySetInnerHTML={{ __html: inlineMd(block) }} />;
-  });
+function Report({ content }: { content: string }) {
+  const lines = content.replace(/\r/g, "").split("\n");
+  return (
+    <div className="report-content">
+      {lines.map((line, index) => {
+        const value = line.trim();
+        if (!value) return <div key={index} className="h-3" />;
+        const heading =
+          value.match(/^#{1,4}\s+(.+)$/) ??
+          value.match(
+            /^(?:\d+[.)]\s+)?(Executive Summary|Threat Assessment|MITRE(?: ATT&CK)? Analysis|Recommended Actions|Recommendations)\s*:?[\s]*$/i,
+          );
+        if (heading)
+          return (
+            <h2
+              key={index}
+              className="mt-7 border-b border-border pb-2 text-lg font-bold tracking-tight first:mt-0"
+            >
+              {heading[1]}
+            </h2>
+          );
+        const ordered = value.match(/^\d+[.)]\s+(.+)$/);
+        const bullet = value.match(/^[-*•]\s+(.+)$/);
+        if (ordered || bullet)
+          return (
+            <div
+              key={index}
+              className="flex gap-3 py-1.5 pl-1 text-sm leading-6 text-muted-foreground"
+            >
+              <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
+              <p>{inline((ordered ?? bullet)![1])}</p>
+            </div>
+          );
+        return (
+          <p key={index} className="text-sm leading-7 text-muted-foreground">
+            {inline(value)}
+          </p>
+        );
+      })}
+    </div>
+  );
 }
 
 function InvestigationPage() {
+  const state = useAnalysisStore();
+  const techniques = selectMitreTechniques(state);
+  const sourceIps = [
+    ...new Set(
+      state.threats.map((threat) => threat.sourceIp).filter((ip): ip is string => Boolean(ip)),
+    ),
+  ];
   const [copied, setCopied] = useState(false);
   async function copy() {
-    await navigator.clipboard.writeText(mockAiReport);
+    await navigator.clipboard.writeText(state.aiReport);
     setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    window.setTimeout(() => setCopied(false), 1800);
   }
   function download() {
-    const blob = new Blob([mockAiReport], { type: "text/markdown" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url; a.download = "investigation-report.md"; a.click();
+    const url = URL.createObjectURL(new Blob([state.aiReport], { type: "text/markdown" }));
+    const anchor = document.createElement("a");
+    anchor.href = url;
+    anchor.download = `${state.filename ?? "investigation"}-report.md`;
+    anchor.click();
     URL.revokeObjectURL(url);
   }
+
+  const actions = state.aiReport ? (
+    <>
+      <Button variant="outline" size="sm" onClick={copy}>
+        {copied ? (
+          <CheckCircle2 className="mr-1.5 h-3.5 w-3.5 text-primary" />
+        ) : (
+          <Copy className="mr-1.5 h-3.5 w-3.5" />
+        )}
+        {copied ? "Copied" : "Copy"}
+      </Button>
+      <Button variant="outline" size="sm" onClick={() => window.print()}>
+        <FileDown className="mr-1.5 h-3.5 w-3.5" />
+        Print
+      </Button>
+      <Button size="sm" onClick={download}>
+        <Download className="mr-1.5 h-3.5 w-3.5" />
+        Download
+      </Button>
+    </>
+  ) : undefined;
   return (
     <>
-      <PageHeader title="AI Investigation Report" description="Incident INC-2306 · Generated by Protecto AI Analyst"
-        actions={<>
-          <Button variant="outline" size="sm" onClick={copy}>
-            {copied ? <CheckCircle2 className="mr-1.5 h-3.5 w-3.5 text-primary" /> : <Copy className="mr-1.5 h-3.5 w-3.5" />}
-            {copied ? "Copied" : "Copy report"}
-          </Button>
-          <Button variant="outline" size="sm" onClick={() => window.print()}><FileDown className="mr-1.5 h-3.5 w-3.5" /> Export PDF</Button>
-          <Button size="sm" onClick={download} className="bg-gradient-to-r from-primary to-accent text-primary-foreground"><Download className="mr-1.5 h-3.5 w-3.5" /> Download</Button>
-        </>} />
-      <div className="grid gap-6 p-6 lg:grid-cols-[1fr_320px]">
-        <article className="glass-panel rounded-2xl p-8">
-          <header className="flex flex-wrap items-center justify-between gap-3 border-b border-border pb-6">
-            <div className="flex items-center gap-3">
-              <div className="grid h-10 w-10 place-items-center rounded-lg bg-gradient-to-br from-primary to-accent text-primary-foreground"><Bot className="h-5 w-5" /></div>
-              <div>
-                <h2 className="text-lg font-bold">Coordinated SSH Intrusion — prod-web-04</h2>
-                <p className="text-xs text-muted-foreground">2025-06-19 · Generated in 2.4s</p>
-              </div>
-            </div>
-            <SeverityBadge severity="critical" />
-          </header>
-          <div>{renderMarkdown(mockAiReport)}</div>
-        </article>
-        <aside className="space-y-4">
-          <div className="glass-panel rounded-xl p-5">
-            <div className="flex items-center gap-2 text-xs uppercase tracking-wider text-muted-foreground"><Sparkles className="h-3.5 w-3.5 text-primary" /> AI confidence</div>
-            <div className="mt-3 flex items-baseline gap-2"><span className="text-4xl font-extrabold text-primary">94%</span><span className="text-xs text-muted-foreground">High</span></div>
-            <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-muted"><div className="h-full rounded-full bg-gradient-to-r from-primary to-accent" style={{ width: "94%" }} /></div>
+      <PageHeader
+        title="AI Investigation"
+        description={
+          state.filename
+            ? `Ollama analysis for ${state.filename}`
+            : "Investigation report generated by your local Ollama model."
+        }
+        actions={actions}
+      />
+      <div className="p-6">
+        {!state.hasAnalyzed ? (
+          <EmptyState title="No investigation available" />
+        ) : !state.aiReport ? (
+          <div role="alert" className="glass-panel rounded-xl p-10 text-center">
+            <Bot className="mx-auto h-7 w-7 text-muted-foreground" />
+            <h2 className="mt-3 text-base font-semibold">AI report unavailable</h2>
+            <p className="mt-1 text-sm text-muted-foreground">
+              The analysis completed, but Ollama did not return a report. Verify the model is
+              running and analyze the log again.
+            </p>
           </div>
-          <div className="glass-panel rounded-xl p-5">
-            <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Key entities</h3>
-            <div className="mt-3 space-y-2 text-sm">
-              {[{ k: "Host", v: "prod-web-04" }, { k: "User", v: "dev-ops" }, { k: "Source IP", v: "203.0.113.42" }, { k: "Destination", v: "198.51.100.83" }].map((e) => (
-                <div key={e.k} className="flex justify-between border-b border-border/50 pb-1.5 last:border-0">
-                  <span className="text-muted-foreground">{e.k}</span>
-                  <span className="font-mono font-medium">{e.v}</span>
+        ) : (
+          <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_300px]">
+            <article className="glass-panel rounded-2xl p-6 sm:p-9">
+              <header className="mb-7 flex items-center gap-3 border-b border-border pb-6">
+                <div className="grid h-11 w-11 place-items-center rounded-xl bg-gradient-to-br from-primary to-accent text-primary-foreground">
+                  <Bot className="h-5 w-5" />
                 </div>
-              ))}
-            </div>
+                <div>
+                  <h2 className="text-lg font-bold">Investigation report</h2>
+                  <p className="text-xs text-muted-foreground">
+                    Generated from the latest backend analysis
+                  </p>
+                </div>
+              </header>
+              <Report content={state.aiReport} />
+            </article>
+            <aside className="space-y-4">
+              <div className="glass-panel rounded-xl p-5">
+                <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  <Sparkles className="h-3.5 w-3.5 text-primary" />
+                  Analysis context
+                </div>
+                <dl className="mt-4 space-y-3 text-sm">
+                  <div className="flex justify-between">
+                    <dt className="text-muted-foreground">Threats</dt>
+                    <dd className="font-mono font-semibold">{state.threats.length}</dd>
+                  </div>
+                  <div className="flex justify-between">
+                    <dt className="text-muted-foreground">Timeline events</dt>
+                    <dd className="font-mono font-semibold">{state.timeline.length}</dd>
+                  </div>
+                </dl>
+              </div>
+              {techniques.length > 0 && (
+                <div className="glass-panel rounded-xl p-5">
+                  <h3 className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                    <Target className="h-3.5 w-3.5 text-accent" />
+                    MITRE techniques
+                  </h3>
+                  <div className="mt-3 flex flex-wrap gap-1.5">
+                    {techniques.map((technique) => (
+                      <span
+                        key={technique.id}
+                        className="rounded-md border border-accent/30 bg-accent/10 px-2 py-1 font-mono text-[11px] font-medium text-accent"
+                      >
+                        {technique.id}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+              {sourceIps.length > 0 && (
+                <div className="glass-panel rounded-xl p-5">
+                  <h3 className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                    <Network className="h-3.5 w-3.5 text-primary" />
+                    Source IPs
+                  </h3>
+                  <div className="mt-3 space-y-2">
+                    {sourceIps.map((ip) => (
+                      <p key={ip} className="font-mono text-xs">
+                        {ip}
+                      </p>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </aside>
           </div>
-          <div className="glass-panel rounded-xl p-5">
-            <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">MITRE techniques</h3>
-            <div className="mt-3 flex flex-wrap gap-1.5">
-              {["T1110.001", "T1548.003", "T1053.003", "T1041", "T1070.002"].map((t) => (
-                <span key={t} className="rounded-md border border-accent/30 bg-accent/10 px-2 py-0.5 font-mono text-[11px] font-medium text-accent">{t}</span>
-              ))}
-            </div>
-          </div>
-        </aside>
+        )}
       </div>
     </>
   );

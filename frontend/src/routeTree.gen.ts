@@ -14,7 +14,6 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard.index'
 import { Route as DashboardTimelineRouteImport } from './routes/dashboard.timeline'
 import { Route as DashboardThreatsRouteImport } from './routes/dashboard.threats'
-import { Route as DashboardSettingsRouteImport } from './routes/dashboard.settings'
 import { Route as DashboardMitreRouteImport } from './routes/dashboard.mitre'
 import { Route as DashboardInvestigationRouteImport } from './routes/dashboard.investigation'
 import { Route as DashboardAnalysisRouteImport } from './routes/dashboard.analysis'
@@ -44,11 +43,6 @@ const DashboardThreatsRoute = DashboardThreatsRouteImport.update({
   path: '/threats',
   getParentRoute: () => DashboardRoute,
 } as any)
-const DashboardSettingsRoute = DashboardSettingsRouteImport.update({
-  id: '/settings',
-  path: '/settings',
-  getParentRoute: () => DashboardRoute,
-} as any)
 const DashboardMitreRoute = DashboardMitreRouteImport.update({
   id: '/mitre',
   path: '/mitre',
@@ -71,7 +65,6 @@ export interface FileRoutesByFullPath {
   '/dashboard/analysis': typeof DashboardAnalysisRoute
   '/dashboard/investigation': typeof DashboardInvestigationRoute
   '/dashboard/mitre': typeof DashboardMitreRoute
-  '/dashboard/settings': typeof DashboardSettingsRoute
   '/dashboard/threats': typeof DashboardThreatsRoute
   '/dashboard/timeline': typeof DashboardTimelineRoute
   '/dashboard/': typeof DashboardIndexRoute
@@ -81,7 +74,6 @@ export interface FileRoutesByTo {
   '/dashboard/analysis': typeof DashboardAnalysisRoute
   '/dashboard/investigation': typeof DashboardInvestigationRoute
   '/dashboard/mitre': typeof DashboardMitreRoute
-  '/dashboard/settings': typeof DashboardSettingsRoute
   '/dashboard/threats': typeof DashboardThreatsRoute
   '/dashboard/timeline': typeof DashboardTimelineRoute
   '/dashboard': typeof DashboardIndexRoute
@@ -93,7 +85,6 @@ export interface FileRoutesById {
   '/dashboard/analysis': typeof DashboardAnalysisRoute
   '/dashboard/investigation': typeof DashboardInvestigationRoute
   '/dashboard/mitre': typeof DashboardMitreRoute
-  '/dashboard/settings': typeof DashboardSettingsRoute
   '/dashboard/threats': typeof DashboardThreatsRoute
   '/dashboard/timeline': typeof DashboardTimelineRoute
   '/dashboard/': typeof DashboardIndexRoute
@@ -106,7 +97,6 @@ export interface FileRouteTypes {
     | '/dashboard/analysis'
     | '/dashboard/investigation'
     | '/dashboard/mitre'
-    | '/dashboard/settings'
     | '/dashboard/threats'
     | '/dashboard/timeline'
     | '/dashboard/'
@@ -116,7 +106,6 @@ export interface FileRouteTypes {
     | '/dashboard/analysis'
     | '/dashboard/investigation'
     | '/dashboard/mitre'
-    | '/dashboard/settings'
     | '/dashboard/threats'
     | '/dashboard/timeline'
     | '/dashboard'
@@ -127,7 +116,6 @@ export interface FileRouteTypes {
     | '/dashboard/analysis'
     | '/dashboard/investigation'
     | '/dashboard/mitre'
-    | '/dashboard/settings'
     | '/dashboard/threats'
     | '/dashboard/timeline'
     | '/dashboard/'
@@ -175,13 +163,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardThreatsRouteImport
       parentRoute: typeof DashboardRoute
     }
-    '/dashboard/settings': {
-      id: '/dashboard/settings'
-      path: '/settings'
-      fullPath: '/dashboard/settings'
-      preLoaderRoute: typeof DashboardSettingsRouteImport
-      parentRoute: typeof DashboardRoute
-    }
     '/dashboard/mitre': {
       id: '/dashboard/mitre'
       path: '/mitre'
@@ -210,7 +191,6 @@ interface DashboardRouteChildren {
   DashboardAnalysisRoute: typeof DashboardAnalysisRoute
   DashboardInvestigationRoute: typeof DashboardInvestigationRoute
   DashboardMitreRoute: typeof DashboardMitreRoute
-  DashboardSettingsRoute: typeof DashboardSettingsRoute
   DashboardThreatsRoute: typeof DashboardThreatsRoute
   DashboardTimelineRoute: typeof DashboardTimelineRoute
   DashboardIndexRoute: typeof DashboardIndexRoute
@@ -220,7 +200,6 @@ const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardAnalysisRoute: DashboardAnalysisRoute,
   DashboardInvestigationRoute: DashboardInvestigationRoute,
   DashboardMitreRoute: DashboardMitreRoute,
-  DashboardSettingsRoute: DashboardSettingsRoute,
   DashboardThreatsRoute: DashboardThreatsRoute,
   DashboardTimelineRoute: DashboardTimelineRoute,
   DashboardIndexRoute: DashboardIndexRoute,
