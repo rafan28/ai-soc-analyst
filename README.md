@@ -166,42 +166,36 @@ Responsive React dashboard featuring:
 
 ## 📸 Screenshots
 
-Add screenshots here:<img width="1918" height="737" alt="image" src="https://github.com/user-attachments/assets/accfa0ae-b3fe-434d-a7ca-ef5ccef61653" />
+Add screenshots here:
+<img width="1918" height="737" alt="image" src="https://github.com/user-attachments/assets/c94c24c5-0874-4952-98af-42dfa4809290" />
+<img width="1918" height="737" alt="image" src="https://github.com/user-attachments/assets/accfa0ae-b3fe-434d-a7ca-ef5ccef61653" />
 
 
 ### Dashboard
 
-*(Insert Screenshot)*
+<img width="1918" height="898" alt="image" src="https://github.com/user-attachments/assets/7c932833-bec0-41b4-8240-d4e0f5efb9c4" />
+<img width="1865" height="896" alt="image" src="https://github.com/user-attachments/assets/4d0ef6a6-0d04-40a1-83c4-4fe09dcb4039" />
+
 
 ---
 
 ### Threat Detection
+<img width="1918" height="908" alt="image" src="https://github.com/user-attachments/assets/798de9fb-14fb-4669-9c94-310ab759f4f9" />
+<img width="1917" height="897" alt="image" src="https://github.com/user-attachments/assets/82b4255e-ef54-4319-872d-1d8b93296213" />
 
-*(Insert Screenshot)*
 
 ---
 
 ### MITRE ATT&CK
 
-*(Insert Screenshot)*
-
----
-
-### AI Investigation
-
-*(Insert Screenshot)*
+<img width="1918" height="887" alt="image" src="https://github.com/user-attachments/assets/8bc8dbfd-f451-4403-8ccd-c4a716f07337" />
 
 ---
 
 ## Incident Report
 
-*(Insert Screenshot)*
-*(Insert Screenshot)*
-*(Insert Screenshot)*
-*(Insert Screenshot)*
-
-
-
+<img width="1918" height="893" alt="image" src="https://github.com/user-attachments/assets/6b311ff4-75a0-4e65-9aa7-ce27bc2878fd" />
+<img width="1917" height="880" alt="image" src="https://github.com/user-attachments/assets/c76bd1fe-9082-4457-a974-560907cb3638" />
 
 
 ---
