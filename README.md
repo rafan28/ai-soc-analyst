@@ -166,7 +166,8 @@ Responsive React dashboard featuring:
 
 ## 📸 Screenshots
 
-Add screenshots here:
+Add screenshots here:<img width="1918" height="737" alt="image" src="https://github.com/user-attachments/assets/accfa0ae-b3fe-434d-a7ca-ef5ccef61653" />
+
 
 ### Dashboard
 
