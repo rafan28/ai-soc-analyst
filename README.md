@@ -192,11 +192,16 @@ Add screenshots here:
 
 ---
 
-## 🎥 Demo
+## Incident Report
 
-Demo Video:
+*(Insert Screenshot)*
+*(Insert Screenshot)*
+*(Insert Screenshot)*
+*(Insert Screenshot)*
 
-*(Insert YouTube Link)*
+
+
+
 
 ---
 
@@ -330,8 +335,8 @@ frontend/
 
 Developed by:
 
-* Your Name
-* Your Friend's Name
+* Rafan Afsar
+* Joel Stephen Meesala
 
 ---
 
