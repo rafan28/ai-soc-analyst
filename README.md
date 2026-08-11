@@ -63,8 +63,14 @@ Automatically maps detected attacks to MITRE ATT&CK techniques.
 
 Current support includes:
 
-* T1110 – Brute Force
-* Additional techniques can easily be added.
+Brute Force Attack — T1110 — Brute Force
+Impossible Travel — T1078 — Valid Accounts
+Privilege Escalation — T1548.003 — Abuse Elevation Control Mechanism: Sudo
+Log Clearing — T1070.002 — Indicator Removal: Clear Linux Logs
+Web Application Exploit — T1190 — Exploit Public-Facing Application
+Vulnerability Scanning — T1595.002 — Active Scanning: Vulnerability Scanning
+Persistence via Cron Job — T1053.003 — Scheduled Task/Job: Cron
+SSH Key Manipulation — T1098.004 — Account Manipulation: SSH Authorized Keys
 
 ---
 
